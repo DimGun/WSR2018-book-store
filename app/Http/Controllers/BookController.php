@@ -6,6 +6,14 @@ use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
+    // Array to store books info
+    protected $books = array();
+
+    public function __construct()
+    {
+      $this->books[] = ['title' => 'Mystical island', 'anons' => 'A group of surrendes find themself on an island'];
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,9 +23,7 @@ class BookController extends Controller
     {
       return response()->json([
         'status' => true,
-        'list' => [
-          ['title' => 'Mystical island', 'anons' => 'A group of surrendes find themself on an island']
-        ]
+        'list' => $this->books
       ]);
     }
 
@@ -52,8 +58,7 @@ class BookController extends Controller
     {
       return response()->json([
         'status' => true,
-        'book' =>
-          ['title' => 'Mystical island', 'anons' => 'A group of surrendes find themself on an island']
+        'book' => $this->books[$id]
       ]);
     }
 
