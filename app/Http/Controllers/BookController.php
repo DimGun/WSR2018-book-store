@@ -46,10 +46,20 @@ class BookController extends Controller
    */
   public function show($id)
   {
-    return response()->json([
-      'status' => true,
-      'book' => $this->books[$id]
-    ]);
+    $book = $this->books[$id] ?? null;
+    $payload = null;
+    if($book) {
+      $payload = [
+        'status' => true,
+        'book' => $book
+      ];
+    } else {
+      $payload = [
+        'status' => false,
+        'message' => 'Book not found'
+      ];
+    }
+    return response()->json($payload);
   }
 
   /**
