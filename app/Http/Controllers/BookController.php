@@ -48,18 +48,22 @@ class BookController extends Controller
   {
     $book = $this->books[$id] ?? null;
     $payload = null;
+    $statusCode = 0;
+
     if($book) {
+      $statusCode = 200;
       $payload = [
         'status' => true,
         'book' => $book
       ];
     } else {
+      $statusCode = 404;
       $payload = [
         'status' => false,
         'message' => 'Book not found'
       ];
     }
-    return response()->json($payload);
+    return response()->json($payload, $statusCode);
   }
 
   /**
