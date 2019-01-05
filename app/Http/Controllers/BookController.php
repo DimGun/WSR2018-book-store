@@ -13,7 +13,12 @@ class BookController extends Controller
      */
     public function index()
     {
-        //
+      return response()->json([
+        'status' => true,
+        'list' => [
+          ['title' => 'Mystical island', 'anons' => 'A group of surrendes find themself on an island']
+        ]
+      ]);
     }
 
     /**
@@ -45,7 +50,11 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        //
+      return response()->json([
+        'status' => true,
+        'book' =>
+          ['title' => 'Mystical island', 'anons' => 'A group of surrendes find themself on an island']
+      ]);
     }
 
     /**
