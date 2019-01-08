@@ -3,15 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Book;
 
 class BookController extends Controller
 {
-  // Array to store books info
-  protected $books = array();
-
   public function __construct()
   {
-    $this->books[] = ['title' => 'Mystical island', 'anons' => 'A group of surrendes find themself on an island'];
   }
 
   /**
@@ -21,9 +18,11 @@ class BookController extends Controller
    */
   public function index()
   {
+    $books = Book::all();
+
     return response()->json([
       'status' => true,
-      'list' => $this->books
+      'list' => $books
     ]);
   }
 
@@ -35,7 +34,11 @@ class BookController extends Controller
    */
   public function store(Request $request)
   {
-    //
+    $book = new Book;
+    $book->title = $request->title;
+    $book->anons = $request->anons;
+    $book->image = $request->image;
+    $book->save();
   }
 
   /**
@@ -46,7 +49,7 @@ class BookController extends Controller
    */
   public function show($id)
   {
-    $book = $this->books[$id] ?? null;
+    $book = Book::find($id);
     $payload = null;
     $statusCode = 0;
 
@@ -75,7 +78,28 @@ class BookController extends Controller
    */
   public function update(Request $request, $id)
   {
-    //
+    $book = Book::find($id);
+    $payload = null;
+    $statusCode = 0;
+
+    if($book) {
+      $book->title = $request->title;
+      $book->anons = $request->anons;
+      $book->image = $request->image;
+      $book->save();
+
+      $statusCode = 201;
+      $payload = [
+        'status' => true,
+      ];
+    } else {
+      $statusCode = 404;
+      $payload = [
+        'status' => false,
+        'message' => 'Book not found'
+      ];
+    }
+    return response()->json($payload, $statusCode);
   }
 
   /**
@@ -86,6 +110,23 @@ class BookController extends Controller
    */
   public function destroy($id)
   {
-    //
+    $book = Book::find($id);
+    $payload = null;
+    $statusCode = 0;
+
+    if($book) {
+      $book->delete();
+      $statusCode = 201;
+      $payload = [
+        'status' => true,
+      ];
+    } else {
+      $statusCode = 404;
+      $payload = [
+        'status' => false,
+        'message' => 'Book not found'
+      ];
+    }
+    return response()->json($payload, $statusCode);
   }
 }
