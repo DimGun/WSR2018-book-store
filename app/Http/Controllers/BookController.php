@@ -20,11 +20,7 @@ class BookController extends Controller
   public function index()
   {
     $books = Book::all();
-
-    return response()->json([
-      'status' => true,
-      'list' => $books
-    ]);
+    return $this->makeResponse(200, ['list' => $books]);
   }
 
   /**
@@ -41,17 +37,16 @@ class BookController extends Controller
       'image' => 'required'
     ]);
 
-    if ($validator->fails()) {
-      return response()->json(['status'=>false, 'message'=>$validator->errors()]);
+    if ($validator->passes()) {
+      $book = new Book;
+      $book->title = $request->title;
+      $book->anons = $request->anons;
+      $book->image = $request->image;
+      $book->save();
+      return $this->makeResponse(200, ['book_id'=>$book->id]);
+    } else {
+      return $this->makeResponse(401, ['message' => $validator->errors()]);
     }
-
-    $book = new Book;
-    $book->title = $request->title;
-    $book->anons = $request->anons;
-    $book->image = $request->image;
-    $book->save();
-
-    return response()->json(['status'=>true, 'book_id'=>$book->id]);
   }
 
   /**
@@ -67,19 +62,10 @@ class BookController extends Controller
     $statusCode = 0;
 
     if($book) {
-      $statusCode = 200;
-      $payload = [
-        'status' => true,
-        'book' => $book
-      ];
+      return $this->makeResponse(200, ['book' => $book]);
     } else {
-      $statusCode = 404;
-      $payload = [
-        'status' => false,
-        'message' => 'Book not found'
-      ];
+      return $this->makeResponse(404, ['message' => 'Book not found']);
     }
-    return response()->json($payload, $statusCode);
   }
 
   /**
@@ -92,27 +78,26 @@ class BookController extends Controller
   public function update(Request $request, $id)
   {
     $book = Book::find($id);
-    $payload = null;
-    $statusCode = 0;
 
-    if($book) {
-      $book->title = $request->title;
-      $book->anons = $request->anons;
-      $book->image = $request->image;
-      $book->save();
-
-      $statusCode = 201;
-      $payload = [
-        'status' => true,
-      ];
+    if(!$book) {
+      return $this->makeResponse(404, ['message' => 'Book not found']);
     } else {
-      $statusCode = 404;
-      $payload = [
-        'status' => false,
-        'message' => 'Book not found'
-      ];
+      $validator = Validator::make($request->all(), [
+        'title' => 'unique:books,title',
+        'anons' => 'nullable',
+        'image' => 'required'
+      ]);
+
+      if ($validator->passes()) {
+        $book->title = $request->title;
+        $book->anons = $request->anons;
+        $book->image = $request->image;
+        $book->save();
+        return $this->makeResponse(201, ['book'=>$book]);
+      } else {
+        return $this->makeResponse(400, ['message' => $validator->errors()]);
+      }
     }
-    return response()->json($payload, $statusCode);
   }
 
   /**
@@ -124,22 +109,26 @@ class BookController extends Controller
   public function destroy($id)
   {
     $book = Book::find($id);
-    $payload = null;
-    $statusCode = 0;
 
     if($book) {
       $book->delete();
-      $statusCode = 201;
-      $payload = [
-        'status' => true,
-      ];
+      return $this->makeResponse(200, null);
     } else {
-      $statusCode = 404;
-      $payload = [
-        'status' => false,
-        'message' => 'Book not found'
-      ];
+      return $this->makeResponse(404, ['message' => 'Book not found']);
     }
-    return response()->json($payload, $statusCode);
+  }
+
+  /**
+   * Constructs a uniform response
+   * @param int $code -- an HTTP code,
+   * @param Array payload -- any additional data that should be passed
+   * @return \Illuminate\Http\Response
+   */
+  protected function makeResponse($code, $payload)
+  {
+    $status = ($code >= 200 && $code < 300);
+    $payload = $payload ?? [];
+    $payload['status'] = $status;
+    return response()->json($payload, $code);
   }
 }
