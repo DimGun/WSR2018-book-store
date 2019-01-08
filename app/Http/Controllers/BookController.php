@@ -31,21 +31,15 @@ class BookController extends Controller
    */
   public function store(Request $request)
   {
-    $validator = Validator::make($request->all(), [
-      'title' => 'unique:books,title',
-      'anons' => 'nullable',
-      'image' => 'required'
-    ]);
+    $data = $request->all();
+    $errors = $this->validateBook($data);
 
-    if ($validator->passes()) {
+    if (sizeof($errors) == 0) { //If no errors
       $book = new Book;
-      $book->title = $request->title;
-      $book->anons = $request->anons;
-      $book->image = $request->image;
-      $book->save();
+      $this->updateBook($book, $data);
       return $this->makeResponse(200, ['book_id'=>$book->id]);
     } else {
-      return $this->makeResponse(401, ['message' => $validator->errors()]);
+      return $this->makeResponse(401, ['message' => $errors]);
     }
   }
 
@@ -82,20 +76,14 @@ class BookController extends Controller
     if(!$book) {
       return $this->makeResponse(404, ['message' => 'Book not found']);
     } else {
-      $validator = Validator::make($request->all(), [
-        'title' => 'unique:books,title',
-        'anons' => 'nullable',
-        'image' => 'required'
-      ]);
+      $data = $request->all();
+      $errors = $this->validateBook($data);
 
-      if ($validator->passes()) {
-        $book->title = $request->title;
-        $book->anons = $request->anons;
-        $book->image = $request->image;
-        $book->save();
+      if (sizeof($errors) == 0) { //If no errors
+        $this->updateBook($book, $data);
         return $this->makeResponse(201, ['book'=>$book]);
       } else {
-        return $this->makeResponse(400, ['message' => $validator->errors()]);
+        return $this->makeResponse(400, ['message' => $errors]);
       }
     }
   }
@@ -130,5 +118,36 @@ class BookController extends Controller
     $payload = $payload ?? [];
     $payload['status'] = $status;
     return response()->json($payload, $code);
+  }
+
+  /**
+   * Validates book data
+   * @param  Array $data -- book data
+   * @return Array -- list of errors
+   */
+  protected function validateBook($data)
+  {
+    $validator = Validator::make($data, [
+      'title' => 'unique:books,title',
+      'anons' => 'nullable',
+      'image' => 'required'
+    ]);
+
+    return $validator->errors();
+  }
+
+  /**
+   * Updates specified book model
+   * @param  Array $data -- book data
+   * @return Array -- list of errors
+   */
+  protected function updateBook($book, $data)
+  {
+      $book->title = $data['title'];
+      $book->anons = $data['anons'];
+      $book->image = $data['image'];
+      $book->save();
+
+      return [];
   }
 }
