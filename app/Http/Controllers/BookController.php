@@ -36,7 +36,7 @@ class BookController extends Controller
 
     if (sizeof($errors) == 0) { //If no errors
       $book = new Book;
-      $this->updateBook($book, $data);
+      $this->updateBook($book, $request);
       return $this->makeResponse(200, ['book_id'=>$book->id]);
     } else {
       return $this->makeResponse(401, ['message' => $errors]);
@@ -80,7 +80,7 @@ class BookController extends Controller
       $errors = $this->validateBook($data);
 
       if (sizeof($errors) == 0) { //If no errors
-        $this->updateBook($book, $data);
+        $this->updateBook($book, $request);
         //TODO: add handlers for errors from updateBook
         return $this->makeResponse(201, ['book'=>$book]);
       } else {
@@ -132,7 +132,7 @@ class BookController extends Controller
     $validator = Validator::make($data, [
       'title' => 'unique:books,title',
       'anons' => 'nullable',
-      'image' => 'required'
+      'image' => 'required|image|mimes:jpeg,png|max:2048'
     ]);
 
     return $validator->errors();
@@ -143,13 +143,20 @@ class BookController extends Controller
    * @param  Array $data -- book data
    * @return Array -- list of errors
    */
-  protected function updateBook($book, $data)
+  protected function updateBook($book, $request)
   {
-      $book->title = $data['title'];
-      $book->anons = $data['anons'];
-      $book->image = $data['image'];
-      $book->save();
+    //Save image
+    $image = $request->file('image');
+    $imageName = time().'.'.$image->getClientOriginalExtension();
+    $destinationPath = public_path('/book_images');
+    $image->move($destinationPath, $imageName);
 
-      return [];
+    $data = $request->all();
+    $book->title = $data['title'];
+    $book->anons = $data['anons'];
+    $book->image = '/book_images/'.$imageName; 
+    $book->save();
+
+    return [];
   }
 }
