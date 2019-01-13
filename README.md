@@ -38,8 +38,8 @@ After this you should be able to interact with the API on your host machine.
 For example, you could open a browser and check `http://localhost/api/books` it should respond with
 ```json
 {
-  'status': true,
-  'books': []
+  "status": true,
+  "books": []
 }
 ```
 
