@@ -81,6 +81,7 @@ class BookController extends Controller
 
       if (sizeof($errors) == 0) { //If no errors
         $this->updateBook($book, $data);
+        //TODO: add handlers for errors from updateBook
         return $this->makeResponse(201, ['book'=>$book]);
       } else {
         return $this->makeResponse(400, ['message' => $errors]);
@@ -127,6 +128,7 @@ class BookController extends Controller
    */
   protected function validateBook($data)
   {
+    //TODO: adjust validator rules to conform to the both new and exiting book update
     $validator = Validator::make($data, [
       'title' => 'unique:books,title',
       'anons' => 'nullable',
