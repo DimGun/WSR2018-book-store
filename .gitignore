@@ -1,6 +1,7 @@
 /node_modules
 /public/hot
 /public/storage
+/public/book_images
 /storage/*.key
 /vendor
 .phpunit.result.cache
