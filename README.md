@@ -20,6 +20,7 @@ Open terminal of your choice, then do following:
 cd book-store/
 git submodules --init
 cd laradock
+mv env-example .env
 docker-compose up -d nginx
 ```
 Then you need to initialize database, I used SQLite in this example (remember KISS).
