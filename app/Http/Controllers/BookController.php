@@ -31,8 +31,12 @@ class BookController extends Controller
    */
   public function store(Request $request)
   {
-    $data = $request->all();
-    $errors = $this->validateBook($data);
+    $validator = Validator::make($request->all(), [
+      'title' => 'required|unique:books,title',
+      'anons' => 'required|nullable',
+      'image' => 'required|image|mimes:jpeg,png|max:2048'
+    ]);
+    $errors = $validator->errors();
 
     if (sizeof($errors) == 0) { //If no errors
       $book = new Book;
@@ -76,8 +80,13 @@ class BookController extends Controller
     if(!$book) {
       return $this->makeResponse(404, ['message' => 'Book not found']);
     } else {
-      $data = $request->all();
-      $errors = $this->validateBook($data);
+      $validator = Validator::make($request->all(), [
+        'title' => 'unique:books,title',
+        'anons' => 'nullable',
+        'image' => 'image|mimes:jpeg,png|max:2048'
+      ]);
+
+      $errors = $validator->errors();
 
       if (sizeof($errors) == 0) { //If no errors
         $this->updateBook($book, $request);
@@ -122,39 +131,26 @@ class BookController extends Controller
   }
 
   /**
-   * Validates book data
-   * @param  Array $data -- book data
-   * @return Array -- list of errors
-   */
-  protected function validateBook($data)
-  {
-    //TODO: adjust validator rules to conform to the both new and exiting book update
-    $validator = Validator::make($data, [
-      'title' => 'unique:books,title',
-      'anons' => 'nullable',
-      'image' => 'required|image|mimes:jpeg,png|max:2048'
-    ]);
-
-    return $validator->errors();
-  }
-
-  /**
    * Updates specified book model
    * @param  Array $data -- book data
    * @return Array -- list of errors
    */
   protected function updateBook($book, $request)
   {
+    $data = $request->all();
+
+    if (isset($data['title'])) $book->title = $data['title'];
+    if (isset($data['anons'])) $book->anons = $data['anons'];
+
     //Save image
     $image = $request->file('image');
-    $imageName = time().'.'.$image->getClientOriginalExtension();
-    $destinationPath = public_path('/book_images');
-    $image->move($destinationPath, $imageName);
+    if ($image) {
+      $imageName = time().'.'.$image->getClientOriginalExtension();
+      $destinationPath = public_path('/book_images');
+      $image->move($destinationPath, $imageName);
+      $book->image = '/book_images/'.$imageName;
+    }
 
-    $data = $request->all();
-    $book->title = $data['title'];
-    $book->anons = $data['anons'];
-    $book->image = '/book_images/'.$imageName; 
     $book->save();
 
     return [];
