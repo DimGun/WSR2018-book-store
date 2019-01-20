@@ -18,7 +18,7 @@ Checkout the repository.
 Open terminal of your choice, then do following:
 ```bash
 cd book-store/
-git submodules --init
+git submodule --init
 cd laradock
 mv env-example .env
 docker-compose up -d nginx
