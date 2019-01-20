@@ -20,4 +20,16 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('/auth', 'Auth\LoginController@login');
 
-Route::resource('books', 'BookController');
+Route::resource('books', 'BookController', [
+  'except' => [
+    'index', 
+    'show'
+  ]
+])->middleware('auth:api');
+
+Route::resource('books', 'BookController', [
+  'only' => [
+    'index', 
+    'show'
+  ]
+]);
