@@ -46,6 +46,14 @@ For example, you could open a browser and check `http://localhost/api/books` it 
 You could also make requests with `curl` from your host machine.
 There are some examples for your reference:
 ```bash
+# authorize the user
+curl -XPOST http://localhost/api/auth \
+  -H "Accept: application/json" \
+  -d 'login=admin' -d 'password=moscow2018'
+#> {"token":"tZzdtYsTOzly7CMlGSpZICK5L2dmWOAtN8MZ31XE8JpxyZIxOBTaGs8WdEJn","status":true}
+```
+After that you could use received token to authorize requests.
+```bash
 # get list of books
 curl -XGET http://localhost/api/books/ -H "Accept: application/json"
 
@@ -53,11 +61,23 @@ curl -XGET http://localhost/api/books/ -H "Accept: application/json"
 curl -XGET -H "Accept: application/json" http://localhost/api/books/1
 
 # create a new book
-curl -XPOST http://localhost/api/books -H "Accept: application/json" -F 'title=Robinson Crusoe' -F 'anons=Ship drowns during a thunderstorm, only one man survives...' -F 'image=http://localhost/images/img0.jpg'
+curl -XPOST http://localhost/api/books \
+  -H "Authorization: Bearer <token>" \
+  -H "Accept: application/json" \
+  -F 'title=Robinson Crusoe' \
+  -F 'anons=Ship drowns during a thunderstorm, only one man survives...' \
+  -F 'image=http://localhost/images/img0.jpg'
 
 # update the book
-curl -XPUT http://localhost/api/books/1 -H "Accept: application/json" -d 'title=Robinson Crusoe by D.Defoe' -d 'anons=Ship drowns during a thunderstorm, only one man survives...' -d 'image=http://localhost/images/img0.jpg'
+curl -XPUT http://localhost/api/books/1 \
+  -H "Authorization: Bearer <token>" \
+  -H "Accept: application/json" \
+  -d 'title=Robinson Crusoe by D.Defoe' \
+  -d 'anons=Ship drowns during a thunderstorm, only one man survives...' \
+  -d 'image=http://localhost/images/img0.jpg'
 
 # delete an existing book
-curl -XDELETE -H "Accept: application/json" http://localhost/api/books/1
+curl -XDELETE  http://localhost/api/books/1 \
+  -H "Authorization: Bearer <token>" \
+  -H "Accept: application/json"
 ```

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+//use App\Http\Controllers\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,4 +18,18 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resource('books', 'BookController');
+Route::post('/auth', 'Auth\LoginController@login');
+
+Route::resource('books', 'BookController', [
+  'except' => [
+    'index', 
+    'show'
+  ]
+])->middleware('auth:api');
+
+Route::resource('books', 'BookController', [
+  'only' => [
+    'index', 
+    'show'
+  ]
+]);
