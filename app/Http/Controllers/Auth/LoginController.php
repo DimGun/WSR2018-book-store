@@ -43,7 +43,7 @@ class LoginController extends Controller
    */
   public function login(Request $request)
   {
-    $credentials = $request->only('email', 'password');
+    $credentials = ['email' => $request->login, 'password' => $request->password];
     if(Auth::attempt($credentials)) {
       $authtorizedUser = Auth::user();
       $authtorizedUser->api_token = str_random(60);
