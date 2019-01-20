@@ -9,6 +9,9 @@ I tried to keep everithing simple stupid as much as possible.
 I was making commits and feature branches a lot, to make it easier to get an idea of the implementation stages.
 I also added `.evn` to repository, so it would be easier to launch a project without any additional modifications.
 
+NB: protocol is defined by authors of this championship, it's pretty weird.
+Don't use things like that in real projects.
+
 ## Prerequisite 
 In order to simplify initial setup I used preconfigured docker image, provided by Laradock (you can find more at https://laradock.io/).
 To run this example you need to install Docker and Docker Compose, or manually setup PHP server.
